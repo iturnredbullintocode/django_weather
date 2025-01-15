@@ -1,0 +1,32 @@
+{% if not get_view %}
+{% if not form.errors %} {# if the form had errors, we didn't get any data anyways #}
+
+    original zipcode entered: {{ weather.zipcode }}<br><br>
+
+    did we get data from cache? {{ weather.from_cache }}<br>
+    did we get data from api? {{ weather.from_api }}<br><br>
+
+    any errors: {{ weather.error }}<br><br>
+
+    Location: {{ weather.region }}<br>
+    Temperature: {{ weather.temp_f }}°F<br>
+    Weather: {{ weather.condition }}<br>
+    Wind: {{ weather.wind_mph }} MPH<br>
+    Humidity {{ weather.humidity }}<br><br>
+
+    Original data{{ weather.raw_data_json_string }}<br><br><br>
+
+{% endif %}
+{% endif %}
+
+
+
+
+<div class="form">
+    <input type="hidden" class="target_url" value="{% url 'weather_ajax' %}">
+    {% csrf_token %}
+    {{ form }}
+    <button>submit</button>
+</dic>
+
+

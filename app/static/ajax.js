@@ -1,3 +1,28 @@
+$(document).ready(apply_events);
+
+
+function apply_events() {
+    $(".form > button").on("click", form_post_request);   }
+
+
+
+function form_post_request() {
+
+    const form = $(this).parent();
+    const target_element = form.parent();
+    const data_to_send = form.children().serialize(); // form.serialize(); no longer works after switching from form to div
+    const target_url = form.find('.target_url').val();
+
+    console.log(this);
+    console.log(event);
+    console.log(form);
+    console.log(target_element);
+
+    post_ajax_request(data_to_send, target_element, target_url);
+}
+
+
+
 
 
 

@@ -159,6 +159,10 @@ CACHES = {
         # from the docker-inspect IP address. so this is gonna be hell Q_Q
         # changing this and saving this file DOES reload the damn site, thankfully..
         "LOCATION": os.environ.get("MEMCACHED_DOCKER_IP", "192.168.48.2"),
+        "OPTIONS": {
+            'connect_timeout': 2,  # Timeout in seconds for establishing a connection
+            'timeout': 1,          # Timeout in seconds for socket operations
+        }
     }
 }
 

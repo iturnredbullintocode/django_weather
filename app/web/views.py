@@ -1,42 +1,53 @@
 from django.views.decorators.http import require_GET, require_POST
 
-from django.shortcuts import render
+from .forms import ZipcodeForm
+from .services import fetch_weather
+from .context import ContextData
 
 
 
-
-######### move to diff file
-####### :( not gonna log jira issues/git tickets, just gonna write notes here today ugh
-
-class ContextData:
-
-    def __init__(self, request, template=None):
-        self.request = request 
-        self.template = template
-
-    def response(self):
-        # turn all the instance variables into a dictionary
-        context = vars(self)
-        request = self.request
-        template = self.template
-        # delete the two extra vars from the context dictionary
-        del context['request']
-        del context['template']
-        ####### make sure the deletion is safe
-        ####### do validation checks on variables before rendering them, make sure theyre there and are right format
-        ####### make sure the variables are sanitized and no sensitive data gets shown, since they will be available in templates
-        # pass everything into the render function
-        return render(
-            request = request,
-            template_name = template,
-            context = context )
-        
 
 @require_GET
 def home(request):    
 
     context = ContextData(request, "home.html")
+
+    # create a blank form
+    context.form = ZipcodeForm()
+
     return context.response()
+
+
+
+
+
+@require_POST
+def weather_ajax(request):
+
+    context = ContextData(request)
+    context.template = 'weather_ajax.html'
+
+    # create a form instance and populate it with data from the request
+    context.form = ZipcodeForm(request.POST)
+
+    # if forn data isn't valid, return early
+    # I could probably auto-execute this in my response class
+    # and I could throw and catch the errors there and return early if needed
+    if not context.form.is_valid():
+        return context.response()
+
+    # context.form.cleaned_data now contains validated data
+    clean_zip_code = context.form.cleaned_data['zipcode']
+
+    # fetch weather from either API or cache,
+    # the logic of doing so is abstracted in this function
+    context.weather = fetch_weather(clean_zip_code)
+
+    # final return
+    return context.response()
+
+
+
 
 
 

@@ -9,3 +9,11 @@ body {
     background: white url("images/background2.jpg") no-repeat;
     background-size: cover;
 }
+
+
+.errorlist {
+    color: red;
+    border: 1px solid red;
+    padding: 4px 4px 4px 24px;
+    border-radius: 6px;
+}

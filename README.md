@@ -2,6 +2,7 @@ Dockerized weather app
 =====================
 Django - Postgres - Memcached
 
+
 running the app
 --------------------
 - Don't use any of these variables/settings in production, for the sake of speed they are sitting in the .env file, and the file is being git tracked.
@@ -14,13 +15,12 @@ running the app
     - memcached server on http://localhost:9300
 - do `docker ps` and grab the container id of the django container
 - execute a database migration command inside the django container via `docker exec -it DJANGO_CONTAINER_ID_GOES_HERE python manage.py migrate`
+    - if you ever change the database models (there arent any now) need to do `makemigrations` before `migrate`
 - do `docker ps` and grab the container id of the memcached container
 - do `docker container inspect MEMCACHED_CONTAINER_ID_GOES_HERE` and toward the end it will show the specific ip address 
 that is inside the docker container that it is running on - something like `192.168.48.2`
 - take memcached's IP address and add it to the `.env.web-dev` file like `MEMCACHED_DOCKER_IP=192.168.48.2`
 
-`python manage.py makemigrations` to make the migrations
-`python manage.py migrate` to actually apply database changes
 
 
 troubleshooting
@@ -45,14 +45,38 @@ how to run the tests
 
 
 
+why memcache?
+-----
+Memcached is an entirely memory-based cache server.
+More lightweight than redis, but still one of the fastest caching solutions around.
+The pymemcache library that is used in this project was developed by pinterest
+and since version 3.2, Django has included a pymemcache-based cache backend.
 
 
 
-caching
+validation
+----------
+django's built-in forms/modelforms/models have fantastic validators for fields, and they're very nicely extendable, all you need
 
-Memcached is an entirely memory-based cache server
 
-Since version 3.2, Django has included a pymemcache-based cache backend.
+front end
+------
+just templates, for the sake of speed. I did make the app send subtemplates via ajax though, 
+for the sake of good user experience with error-handling,
+not having to wait if the api times out for some reason, more natural feel
+
+
+logging
+-----------
+
+
+
+considerations (not implemented)
+---------------------------------
+- IP address based throttling
+    - although the cache is nice, a user could just spam the API with a crapton of different zipcodes and
+        abuse my API key so additional ways to throttle requests would be ice
+
 
 
 
@@ -65,6 +89,7 @@ django admin site
     - Email address: `test_email@gmail.com`
     - pw `testtesttest`
 - then go to `http://localhost:9100/admin/` and log in
+
 
 
 django debug toolbar
@@ -81,19 +106,22 @@ django debug toolbar
 
 
 
+postgres
+----
+technically, the DB is not in use because we only need to store key value pairs to
+prevent the api being hit too often, and for that, a cache is more efficient.
+however, I am assuming y'all will ask me to add more data or some sort of interactions,
+so I've set up appropriate database models ahead of time but commented them out for now.
 
+postgres can be connected to if you have pgadmin
+- Host name/address: `localhost`
+- Port: `9200`
+- Username: `test_user` 
+- Password: `test_password`
 
-
-
-go into postgres/db container via `docker exec -it CONTAINER_ID_GOES_HERE bash`
-
-and do `psql --username=USERNAME_GOES_HERE --dbname=DATABASE_NAME_GOES_HERE`
-(so in our case `psql --username=test_user --dbname=django_test`) to go into database UI
-
-do `\l` or `\list` to see list of databases
-
-`\c django_test`  to change to the database
-
-then do `\dt` to see tables in the database
-
-you can `\q` to quit 
+you can go into postgres/db container via `docker exec -it CONTAINER_ID_GOES_HERE bash`
+- do `psql --username=test_user --dbname=django_test` to go into database UI
+- do `\l` or `\list` to see list of databases
+- `\c django_test`  to change to the database
+- then do `\dt` to see tables in the database
+- you can `\q` to quit 

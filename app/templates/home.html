@@ -13,7 +13,7 @@ You can grab weather data from the USA.
 <br>
 
 <div>
-{# render a subtemplate here later #}
+{% include "weather_ajax.html" with get_view=True %} 
 </div>
 
 {% endblock content %}

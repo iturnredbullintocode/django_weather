@@ -28,6 +28,10 @@ urlpatterns = [
 
     # ex: /
     path("", views.home, name="home"),
+    # ex: /weather_ajax
+    path("weather_ajax", views.weather_ajax, name="weather_ajax"),
+    # ex: /polls/5/results/
+    # path("<int:question_id>/results/", views.results, name="results"),
 ]
 
 # only when not testing, activate django debug toolbar urls

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .forms import ZipcodeForm
+from .forms import ZipcodeForm, RegexZipcodeForm
 
 
 
@@ -24,13 +24,13 @@ class ZipcodeFormTests(TestCase):
 
     def test_zipcode_works(self):
         """
-        making sure zipcode works fine despite a throwaway form field, gets cast to int
+        making sure zipcode works fine despite a throwaway form field, gets cast to string
         """
         data = {"zipcode": "10019",
                 "extra_throwaway_field": "test",   }
         form = ZipcodeForm(data)
         self.assertIs(form.is_valid(), True)
-        self.assertEqual(form.cleaned_data['zipcode'], 10019)
+        self.assertEqual(form.cleaned_data['zipcode'], '10019')
 
     def test_zipcode_too_high(self):
         """
@@ -41,6 +41,23 @@ class ZipcodeFormTests(TestCase):
         form = ZipcodeForm(data)
         self.assertIs(form.is_valid(), False)
 
+
+
+class RegexZipcodeFormTests(TestCase):
+
+    def test_regex_zipcode_format(self):
+        """
+        making sure the regex version of the zipcode is fine
+        """
+        form = RegexZipcodeForm({"zipcode": "10019"})
+        self.assertIs(form.is_valid(), True)
+        self.assertEqual(form.cleaned_data['zipcode'], '10019')
+        form = RegexZipcodeForm({"zipcode": "058843737272"})
+        self.assertIs(form.is_valid(), False)
+        form = RegexZipcodeForm({"zipcode": "1oo19"})
+        self.assertIs(form.is_valid(), False)
+        form = RegexZipcodeForm({"zipcode": "1"})
+        self.assertIs(form.is_valid(), False)
 
 
 
