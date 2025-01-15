@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .forms import ZipcodeForm, RegexZipcodeForm
+from .services import Weather, fetch_weather
 
 
 
@@ -16,6 +17,38 @@ class HomeViewTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+
+
+
+
+# shortcut function
+def create_weather(zipcode):
+    """
+    Create a weather object with the given `zipcode`
+    """
+    return Weather(zipcode)
+
+
+
+
+class WeatherTests(TestCase):
+
+    def test_weather_valid(self):
+        """
+        should return no errors
+        """
+        weather = fetch_weather('10019')
+        self.assertIs(weather.get('error'), None)
+
+    def test_nonexistant_but_valid_format_zipcode(self):
+        """
+        some zip codes are of proper 5digit format
+        but dont exist in the usa
+        """
+        weather = fetch_weather('99999')
+        self.assertEqual(weather.get('error'), True)
+
+        
 
 
 

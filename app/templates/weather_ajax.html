@@ -1,20 +1,44 @@
 {% if not get_view %}
 {% if not form.errors %} {# if the form had errors, we didn't get any data anyways #}
 
-    original zipcode entered: {{ weather.zipcode }}<br><br>
+    {% if weather.error %}
 
-    did we get data from cache? {{ weather.from_cache }}<br>
-    did we get data from api? {{ weather.from_api }}<br><br>
+        <div class="error">Error! {{ weather.error }}</div><br>
 
-    any errors: {{ weather.error }}<br><br>
+    {% else %}
 
-    Location: {{ weather.region }}<br>
-    Temperature: {{ weather.temp_f }}°F<br>
-    Weather: {{ weather.condition }}<br>
-    Wind: {{ weather.wind_mph }} MPH<br>
-    Humidity {{ weather.humidity }}<br><br>
+        Zipcode: {{ weather.zipcode }}<br><br>
+        Location: {{ weather.region }}<br>
+        Temperature: {{ weather.temp_f }}°F<br>
+        Weather: {{ weather.condition }}<br>
+        Wind: {{ weather.wind_mph }} MPH<br>
+        Humidity {{ weather.humidity }}<br><br>
 
-    Original data{{ weather.raw_data_json_string }}<br><br><br>
+    {% endif %}
+
+    <button onclick="expand_next(this);">see details</button>
+    <div class="expand" style="display: none;">
+
+        any errors: {{ weather.error }}<br><br>
+
+        did we get data from cache? {{ weather.from_cache }}<br>
+        did we get data from api? {{ weather.from_api }}<br><br>
+
+        raw data fetched:<br>{{ weather.raw_data_json_string }}
+
+        {% if weather.error %}
+            <br><br>
+            Zipcode: {{ weather.zipcode }}<br><br>
+            Location: {{ weather.region }}<br>
+            Temperature: {{ weather.temp_f }}°F<br>
+            Weather: {{ weather.condition }}<br>
+            Wind: {{ weather.wind_mph }} MPH<br>
+            Humidity {{ weather.humidity }}
+        {% endif %}
+
+    </div>
+    <br>
+    <br>
 
 {% endif %}
 {% endif %}

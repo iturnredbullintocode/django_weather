@@ -5,7 +5,8 @@ Django - Postgres - Memcached
 
 running the app
 --------------------
-- Don't use any of these variables/settings in production, for the sake of speed they are sitting in the .env file, and the file is being git tracked.
+- Don't use any of these variables/settings in production, for the sake of speed most of them are sitting in the .env file, and the file is being git tracked.
+- Ask me for the weather api key, or use your own - open `.env.web-dev` file set `WEATHER_API_KEY=` (add the key right after the `=` sign)
 - Assuming development environment will be needed friday, so django toolbar is currently set to on, as well, and project settings are dev mode.
 - you will need Docker installed to run the app
 - simply clone the entire repo and `docker-compose build` and `docker-compose up -d`
@@ -20,6 +21,8 @@ running the app
 - do `docker container inspect MEMCACHED_CONTAINER_ID_GOES_HERE` and toward the end it will show the specific ip address 
 that is inside the docker container that it is running on - something like `192.168.48.2`
 - take memcached's IP address and add it to the `.env.web-dev` file like `MEMCACHED_DOCKER_IP=192.168.48.2`
+- **Now, the app should be ready you can start using the app right away in your browser
+   on `http://localhost:9100` it will show the homepage and you can try inputting data**
 
 
 
@@ -66,18 +69,32 @@ for the sake of good user experience with error-handling,
 not having to wait if the api times out for some reason, more natural feel
 
 
-logging
------------
-
 
 
 considerations (not implemented)
 ---------------------------------
-- IP address based throttling
+- IP address based throttling should be implemented
     - although the cache is nice, a user could just spam the API with a crapton of different zipcodes and
         abuse my API key so additional ways to throttle requests would be ice
-
-
+- logging could be done better, I just threw in a logging library with random logs for a few things, ran out of time
+- fetch_weather should be rewritten as a method of the weather class,
+    - split into multiple methods one for cache, one for api
+    - more intuitive to have it all in one class
+- pymemcache error handling should be added, here is list of all possible errors
+    - pymemcache.exceptions.MemcacheUnknownCommandError
+    - pymemcache.exceptions.MemcacheClientError
+    - pymemcache.exceptions.MemcacheServerError
+    - pymemcache.exceptions.MemcacheUnknownError
+    - pymemcache.exceptions.MemcacheUnexpectedCloseError
+    - pymemcache.exceptions.MemcacheIllegalInputError
+    - socket.timeout
+    - socket.error
+- ajax 500 error and other server error wrapping
+    - ajax function should be as simple as possible - just return subtemplate
+    - this means that 500, 404 errors and other page errors should be handled
+        in a specific way by *django*, for ajax requests, not by front end or template
+    - preferably with a wapper such as @ajax (I think one exists, but needs
+        to be extended to handle server errors)
 
 
 
