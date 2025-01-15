@@ -2,9 +2,21 @@
 <html lang="en-US">
 <head>
 
+    {% load static %}
+
     <meta charset="utf-8">
     
     <title>Web App • {% block title %}Home{% endblock title %}</title>
+
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+
+    <script src="{% static 'polls/jquery-3.7.1.min.js' %}"></script>
+    <!-- cached google version -->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>-->
+
+    <script src="{% static 'ajax.js' %}"></script>
 
 </head>
 <body>
