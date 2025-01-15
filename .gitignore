@@ -18,6 +18,6 @@ venv/
 # don't track Visual Studio Code settings
 .vscode/
 
-# don't track postgres contents
-!data/
+# don't track postgres contents but keep the folder
 data/*
+!data/.keepfile

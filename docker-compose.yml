@@ -1,0 +1,47 @@
+services:
+
+  db:
+
+    image: postgres
+    # note: "outside of container":"inside of container"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    # Imports variables from specified file, makes them acessible inside of docker.
+    env_file:
+      - .env.db-dev
+    ports:
+      - "9200:5432"
+
+  web_http:
+
+    # Executes the Dockerfile found in the current (specified by '.') directory.
+    build: ./app
+    # note: "outside of container":"inside of container"
+    ports:
+      - "9100:4000"
+    # the /app folder in the outside filesystem will be mapped to
+    # the /usr/src/app folder inside the container
+    volumes:
+      - ./app:/usr/src/app
+    # Imports variables from specified file, makes them acessible inside of docker.
+    env_file:
+      - .env.web-dev
+    # note: This is the command that runs inside the docker container so for the port, 
+    #   put the port thats supposed to be inside the container.
+    command: python manage.py runserver 0.0.0.0:4000
+    # if you try to use gunicorn it wont serve static files, need nginx for that, not implemented here
+    # command: gunicorn web.wsgi:application --bind 0.0.0.0:4000
+    depends_on:
+      - db
+
+  cache:
+
+    image: memcached:latest
+    ports:
+      - "9300:11211"
+    # sets the memory limit to 256MB and
+    # the maximum number of simultaneous connections to 1024
+    command: # -m 256 -c 1024
+      - --conn-limit=1024
+      - --memory-limit=64
+      - --threads=4
