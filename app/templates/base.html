@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+
+    <meta charset="utf-8">
+    
+    <title>Web App • {% block title %}Home{% endblock title %}</title>
+
+</head>
+<body>
+
+    <div id="ui">
+    {% block ui %}
+    {# ui goes here #}
+    {% endblock ui %}
+    </div>
+
+    <div id="content">
+    {% block content %}
+    {# default content #}
+    {% endblock content %}
+    </div>
+
+    {% block scripts %}
+    {% endblock scripts %}
+
+</body>
+</html>

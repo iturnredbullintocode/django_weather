@@ -27,7 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # ex: /
-    path("", views.index, name="home"),
+    path("", views.home, name="home"),
 ]
 
 # only when not testing, activate django debug toolbar urls
