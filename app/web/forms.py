@@ -9,6 +9,9 @@ class ZipcodeForm(forms.Form):
         max_value=99999,
         min_value=10000)
 
+    forecast = forms.BooleanField(
+        label="do you want 5 forecast days?",   )
+
     def clean_zipcode(self):
         # this method is run after the data has been validated
         # zipcode needs to be a string

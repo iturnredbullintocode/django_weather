@@ -38,10 +38,11 @@ def weather_ajax(request):
 
     # context.form.cleaned_data now contains validated data
     clean_zip_code = context.form.cleaned_data['zipcode']
+    forecast = context.form.cleaned_data['forecast']
 
     # fetch weather from either API or cache,
     # the logic of doing so is abstracted in this function
-    context.weather = fetch_weather(clean_zip_code)
+    context.weather = fetch_weather(clean_zip_code, forecast=forecast)
 
     # final return
     return context.response()

@@ -12,7 +12,17 @@
         Temperature: {{ weather.temp_f }}°F<br>
         Weather: {{ weather.condition }}<br>
         Wind: {{ weather.wind_mph }} MPH<br>
-        Humidity {{ weather.humidity }}<br><br>
+        Humidity {{ weather.humidity }}<br>
+
+        {% if weather.days %}
+        <br><br>
+        Forecast:<br>
+        {% for day in weather.days %}
+            day: {{ day.date }}<br>
+            max temp: {{ day.maxtemp_f }}<br>
+        {% endfor %}
+        {% endif %}
+        <br>
 
     {% endif %}
 
@@ -51,6 +61,6 @@
     {% csrf_token %}
     {{ form }}
     <button>submit</button>
-</dic>
+</div>
 
 

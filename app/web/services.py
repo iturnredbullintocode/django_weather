@@ -11,8 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 
-
-
 class Weather:
 
     def __init__(self, zipcode):
@@ -31,7 +29,10 @@ class Weather:
         self.humidity = None
         self.raw_data_json_string = None
 
-    def set_data(self, json_string):
+        self.days = []
+
+
+    def set_data(self, json_string, forecast=False):
         json_string = json_string.replace("\n", "")
         json_string = json_string.replace("\'", "\"")
         self.raw_data_json_string = json_string
@@ -79,6 +80,20 @@ class Weather:
             self.error_code = 101
             return False
 
+        if forecast:
+            try:
+                forecast = json_dict.get('forecast')
+                for day in forecast.get('forecastday'):
+                    data = { 'date': day.get('date'), 'maxtemp_f': day.get('day').get('maxtemp_f') }
+                    self.days.append(data)
+                self.cachable_data = True
+
+            except (AttributeError, KeyError) as error:
+                logger.warning(f"Malformed JSON string: {error}, json dict is {json_dict}")
+                self.error = f"Malformed JSON string"
+                self.error_code = 101
+                return False
+
         return True
     
 
@@ -90,16 +105,21 @@ class Weather:
 
 # accepts a cleaned zipcode from a ZipcodeForm
 # returns clean valid dict of vars for template context, of Weather class
-def fetch_weather(zipcode):
+def fetch_weather(zipcode, forecast=False):
 
     weather = Weather(zipcode)
 
+    cache_key = zipcode
+    if forecast:
+        cache_key = zipcode + "_forecast"
+
     # cache key should be a str, and value can be any picklable Python object.
-    cached_value = cache.get(zipcode)
+    cached_value = cache.get(cache_key)
+    
 
     if cached_value:
         weather.from_cache = True
-        weather.set_data(cached_value)
+        weather.set_data(cached_value, forecast=forecast)
 
     
         # return early
@@ -164,9 +184,15 @@ def fetch_weather(zipcode):
 
     api_timeout_secs = 10
     payload = {'key': api_key, 'q': zipcode, 'aqi': 'no'}
+    if forecast:
+        payload['days'] = "5"
+
+    url = 'http://api.weatherapi.com/v1/current.json'
+    if forecast:
+        url = 'http://api.weatherapi.com/v1/forecast.json'
 
     try:
-        response = requests.get('http://api.weatherapi.com/v1/current.json', params=payload, timeout=api_timeout_secs)
+        response = requests.get(url, params=payload, timeout=api_timeout_secs)
     except requests.ConnectTimeout as error:
         weather.error = "connect timeout!"
         return weather()
@@ -216,14 +242,14 @@ def fetch_weather(zipcode):
 
     # use set_data first, before putting into cache, to catch errors.
     # or else some api error could be added to cache
-    weather.set_data(response_json_string)
+    weather.set_data(response_json_string, forecast=forecast)
     weather.from_api = True
 
     # add the data to cache
     # careful to not add invalid data to cache, ever
     if weather.cachable_data:
         cache_timeout_secs = 60 * 60
-        cache.set(key=zipcode, value=response_json_string, timeout=cache_timeout_secs)
+        cache.set(key=cache_key, value=response_json_string, timeout=cache_timeout_secs)
 
     # Weather class has a self-calling method
     return weather()
