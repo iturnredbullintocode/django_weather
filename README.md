@@ -7,20 +7,23 @@ running the app
 --------------------
 - Don't use any of these variables/settings in production, for the sake of speed most of them are sitting in the .env file, and the file is being git tracked.
 - Ask me for the weather api key, or use your own - open `.env.web-dev` file set `WEATHER_API_KEY=` (add the key right after the `=` sign)
+    - You could also get your own API key by signing up for the weather API used in the app at https://www.weatherapi.com/
 - Assuming development environment will be needed friday, so django toolbar is currently set to on, as well, and project settings are dev mode.
 - you will need Docker installed to run the app
 - simply clone the entire repo and `docker-compose build` and `docker-compose up -d`
+- the app won't be ready yet because the containers need adjustments:
+    - do `docker ps` and grab the container id of the django container
+    - execute a database migration command inside the django container via `docker exec -it DJANGO_CONTAINER_ID_GOES_HERE python manage.py migrate`
+    - do `docker ps` and grab the container id of the memcached container
+    - do `docker container inspect MEMCACHED_CONTAINER_ID_GOES_HERE` and toward the end it will show the specific ip address 
+        that is inside the docker container that it is running on - something like `192.168.48.2`
+    - take memcached's IP address and add it to the `.env.web-dev` file like `MEMCACHED_DOCKER_IP=192.168.48.2`
+- now you will need to kill and restart the django container via `docker kill DJANGO_CONTAINER_ID_GOES_HERE` and then `docker-compose up -d` again
 - three docker containers will spin up:
     - django on http://localhost:9100
     - postgres on http://localhost:9200
     - memcached server on http://localhost:9300
-- do `docker ps` and grab the container id of the django container
-- execute a database migration command inside the django container via `docker exec -it DJANGO_CONTAINER_ID_GOES_HERE python manage.py migrate`
-    - if you ever change the database models (there arent any now) need to do `makemigrations` before `migrate`
-- do `docker ps` and grab the container id of the memcached container
-- do `docker container inspect MEMCACHED_CONTAINER_ID_GOES_HERE` and toward the end it will show the specific ip address 
-that is inside the docker container that it is running on - something like `192.168.48.2`
-- take memcached's IP address and add it to the `.env.web-dev` file like `MEMCACHED_DOCKER_IP=192.168.48.2`
+
 - **Now, the app should be ready you can start using the app right away in your browser
    on `http://localhost:9100` it will show the homepage and you can try inputting data**
 
